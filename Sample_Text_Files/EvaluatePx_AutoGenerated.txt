@@ -1,0 +1,100 @@
+Function EvaluatePx(x As Double) As Double
+    Dim intervalsPart1 As Variant, intervalsPart2 As Variant, intervalsPart3 As Variant
+    Dim coeffsPart1 As Variant, coeffsPart2 As Variant, coeffsPart3 As Variant
+    Dim intervals As Variant, coeffs As Variant
+    Dim i As Integer, dx As Double
+
+    ' Define intervals
+    intervalsPart1 = Array( _
+        Array(883.09696, 896.71487), _
+        Array(896.71487, 903.47716), _
+        Array(903.47716, 907.70611), _
+        Array(907.70611, 910.67032), _
+        Array(910.67032, 912.89626), _
+        Array(912.89626, 914.64705), _
+        Array(914.64705, 916.07082), _
+        Array(916.07082, 917.25817), _
+        Array(917.25817, 918.26803), _
+        Array(918.26803, 919.14064))
+    intervalsPart2 = Array( _
+        Array(919.14064, 919.90451), _
+        Array(919.90451, 920.58051), _
+        Array(920.58051, 921.18429), _
+        Array(921.18429, 921.72785), _
+        Array(921.72785, 922.22058), _
+        Array(922.22058, 922.66995), _
+        Array(922.66995, 923.08195), _
+        Array(923.08195, 923.46151), _
+        Array(923.46151, 923.81265), _
+        Array(923.81265, 924.13877))
+    intervalsPart3 = Array( _
+        Array(924.13877, 924.44269), _
+        Array(924.44269, 924.72684), _
+        Array(924.72684, 924.99325), _
+        Array(924.99325, 925.24371), _
+        Array(925.24371, 925.47975), _
+        Array(925.47975, 925.70270), _
+        Array(925.70270, 925.91372))
+
+    intervals = JoinArrays(intervalsPart1, intervalsPart2, intervalsPart3)
+
+    ' Define coefficients
+    coeffsPart1 = Array( _
+        Array(-0.012615, 0.574952, 2.614446, 110.369010, 883.09696), _
+        Array(-0.020596, 0.888385, 11.255545, 220.738021, 896.71487), _
+        Array(-0.041661, 1.512999, 20.445139, 331.107031, 903.47716), _
+        Array(-0.073060, 2.317321, 31.006724, 441.476042, 907.70611), _
+        Array(-0.115969, 3.296950, 42.818969, 551.845052, 910.67032), _
+        Array(-0.171514, 4.450707, 55.772761, 662.214063, 912.89626), _
+        Array(-0.240734, 5.778136, 69.780111, 772.583073, 914.64705), _
+        Array(-0.324602, 7.279018, 84.769590, 882.952084, 916.07082), _
+        Array(-0.424029, 8.953237, 100.682108, 993.321094, 917.25817), _
+        Array(-0.539877, 10.800723, 117.467870, 1103.690105, 918.26803))
+    coeffsPart2 = Array( _
+        Array(-0.672963, 12.821434, 135.084230, 1214.059115, 919.14064), _
+        Array(-0.824069, 15.015340, 153.494163, 1324.428126, 919.90451), _
+        Array(-0.993945, 17.382422, 172.665143, 1434.797136, 920.58051), _
+        Array(-1.183311, 19.922665, 192.568312, 1545.166147, 921.18429), _
+        Array(-1.392860, 22.636061, 213.177840, 1655.535157, 921.72785), _
+        Array(-1.623265, 25.522599, 234.470437, 1765.904168, 922.22058), _
+        Array(-1.875176, 28.582276, 256.424964, 1876.273178, 922.66995), _
+        Array(-2.149223, 31.815086, 279.022122, 1986.642189, 923.08195), _
+        Array(-2.446022, 35.221025, 302.244202, 2097.011199, 923.46151), _
+        Array(-2.766169, 38.800092, 326.074877, 2207.380210, 923.81265))
+    coeffsPart3 = Array( _
+        Array(-3.110247, 42.552282, 350.499032, 2317.749220, 924.13877), _
+        Array(-3.478825, 46.477595, 375.502624, 2428.118231, 924.44269), _
+        Array(-3.872459, 50.576029, 401.072557, 2538.487241, 924.72684), _
+        Array(-4.291692, 54.847583, 427.196586, 2648.856252, 924.99325), _
+        Array(-4.737058, 59.292255, 453.863222, 2759.225262, 925.24371), _
+        Array(-5.209077, 63.910045, 481.061664, 2869.594273, 925.47975), _
+        Array(-14.385752, 70.532080, 508.781729, 2979.963283, 925.70270))
+
+    coeffs = JoinArrays(coeffsPart1, coeffsPart2, coeffsPart3)
+
+    ' Evaluate x using corresponding interval and polynomial
+    For i = 0 To UBound(intervals)
+        If x >= intervals(i)(0) And x <= intervals(i)(1) Then
+            dx = x - coeffs(i)(4)
+            EvaluatePx = coeffs(i)(0) * dx ^ 3 + coeffs(i)(1) * dx ^ 2 + coeffs(i)(2) * dx + coeffs(i)(3)
+            Exit Function
+        End If
+    Next i
+
+    ' If x is not in any interval, return error
+    EvaluatePx = CVErr(xlErrNA)
+End Function
+
+' Helper function to concatenate multiple arrays
+Private Function JoinArrays(arr1 As Variant, arr2 As Variant, arr3 As Variant) As Variant
+    Dim result() As Variant
+    Dim i As Long, totalLen As Long
+    totalLen = UBound(arr1) + 1 + UBound(arr2) + 1 + UBound(arr3) + 1
+    ReDim result(0 To totalLen - 1)
+
+    For i = 0 To UBound(arr1): result(i) = arr1(i): Next i
+    For i = 0 To UBound(arr2): result(i + UBound(arr1) + 1) = arr2(i): Next i
+    For i = 0 To UBound(arr3): result(i + UBound(arr1) + UBound(arr2) + 2) = arr3(i): Next i
+
+    JoinArrays = result
+End Function
